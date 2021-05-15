@@ -23,6 +23,6 @@ app.use('/api/examenes', require('./routes/examen'));
 const host = process.env.HOST || '0.0.0.0';
 const port = process.env.PORT || 3000;
 
-app.listen(port, host, () => {
-    console.log('Servidor corriendo en el puerto ' + process.env.PORT);
+app.listen(rocess.env.PORT || 3000, process.env.HOST || '0.0.0.0', () => {
+    console.log('Servidor corriendo en el puerto ' + rocess.env.PORT || 3000);
 });
