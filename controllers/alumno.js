@@ -6,7 +6,7 @@ const Profesor = require('../models/profesor');
 const Alumno = require('../models/alumno');
 const ExamenResuelto = require('../models/examen-resuelto');
 const { validarPassword } = require('../helpers/validarPassword');
-const { infoToken } = require('../helpers/infoToken');
+const { infoToken } = require('../helpers/infotoken');
 const { updateOne } = require('../models/clase');
 
 const sleep = (ms) => {
