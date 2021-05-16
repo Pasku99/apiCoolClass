@@ -6,7 +6,7 @@ const Profesor = require('../models/profesor');
 const Alumno = require('../models/alumno');
 const ExamenResuelto = require('../models/examen-resuelto');
 const { validarPassword } = require('../helpers/validarPassword');
-const { infoToken } = require('../helpers/infotoken');
+const { infoToken } = require('../helpers/infoToken');
 const { updateOne } = require('../models/clase');
 
 const sleep = (ms) => {
@@ -313,13 +313,19 @@ const eliminarAlumno = async(req, res = response) => {
 }
 
 const escogerClase = async(req, res = response) => {
-    const { uidAlumno, uidCentro, nombreClase } = req.body;
+    const { uidAlumno, uidCentro, nombreClase, codigo } = req.body;
     try {
         const centro = await Centroeducativo.findById(uidCentro);
         if (!centro) {
             return res.status(400).json({
                 ok: false,
                 msg: 'Error al encontrar centro educativo correspondiente'
+            });
+        }
+        if (centro.codigoAlumno != codigo) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Código incorrecto. Por favor, comuníquese con su centro para obtener el código.'
             });
         }
 
@@ -342,6 +348,14 @@ const escogerClase = async(req, res = response) => {
             return res.status(400).json({
                 ok: false,
                 msg: 'Ya estás registrado en dicha clase'
+            });
+        }
+
+        const eliminarExamenesResueltosAlumno = await ExamenResuelto.deleteMany({ uidAlumno: uidAlumno })
+        if (!eliminarExamenesResueltosAlumno) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Error al eliminar exámenes resueltos del alumno'
             });
         }
 
