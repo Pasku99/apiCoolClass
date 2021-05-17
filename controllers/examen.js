@@ -570,18 +570,18 @@ const obtenerProximosExamenesAlumno = async(req, res = response) => {
         let proximosexamenesAlumno, total;
         if (limitado) {
             [proximosexamenesAlumno, total] = await Promise.all([
-                Examen.find({ uidProfesor: uidProfesor, nombreClase: clase.nombre, fechaFinal: { $gte: fechaInicio } }).sort({ fecha: 'desc' }).limit(6),
-                Examen.countDocuments({ uidProfesor: uidProfesor, nombreClase: clase.nombre, fechaFinal: { $gte: fechaInicio } }).sort({ fecha: 'desc' }).limit(6)
+                Examen.find({ uidProfesor: uidProfesor, nombreClase: clase.nombre, fechaFinal: { $gte: fechaInicio } }).sort({ fechaComienzo: 'desc' }).limit(6),
+                Examen.countDocuments({ uidProfesor: uidProfesor, nombreClase: clase.nombre, fechaFinal: { $gte: fechaInicio } }).sort({ fechaComienzo: 'desc' }).limit(6)
             ]);
         } else if (nombreExamen) {
             [proximosexamenesAlumno, total] = await Promise.all([
-                Examen.find({ $and: [{ uidProfesor: uidProfesor, nombreClase: clase.nombre, fechaFinal: { $gte: fechaInicio } }, { $or: [{ nombreExamen: textoBusqueda }] }] }).sort({ date: 'desc' }),
-                Examen.countDocuments({ $and: [{ uidProfesor: uidProfesor, nombreClase: clase.nombre, fechaFinal: { $gte: fechaInicio } }, { $or: [{ nombreExamen: textoBusqueda }] }] }).sort({ date: 'desc' }),
+                Examen.find({ $and: [{ uidProfesor: uidProfesor, nombreClase: clase.nombre, fechaFinal: { $gte: fechaInicio } }, { $or: [{ nombreExamen: textoBusqueda }] }] }).sort({ fechaComienzo: 'desc' }),
+                Examen.countDocuments({ $and: [{ uidProfesor: uidProfesor, nombreClase: clase.nombre, fechaFinal: { $gte: fechaInicio } }, { $or: [{ nombreExamen: textoBusqueda }] }] }).sort({ fechaComienzo: 'desc' }),
             ]);
         } else {
             [proximosexamenesAlumno, total] = await Promise.all([
-                Examen.find({ uidProfesor: uidProfesor, nombreClase: clase.nombre, fechaFinal: { $gte: fechaInicio } }).sort({ fecha: 'desc' }),
-                Examen.find({ uidProfesor: uidProfesor, nombreClase: clase.nombre, fechaFinal: { $gte: fechaInicio } }).sort({ fecha: 'desc' })
+                Examen.find({ uidProfesor: uidProfesor, nombreClase: clase.nombre, fechaFinal: { $gte: fechaInicio } }).sort({ fechaComienzo: 'desc' }),
+                Examen.find({ uidProfesor: uidProfesor, nombreClase: clase.nombre, fechaFinal: { $gte: fechaInicio } }).sort({ fechaComienzo: 'desc' })
             ]);
         }
 
@@ -992,13 +992,13 @@ const obtenerTodosProximosExamenesAlumno = async(req, res = response) => {
         // fechaActual.setHours(fechaActual.getHours() + 2);
         if (limitado) {
             [proximosExamenesAlumno, total] = await Promise.all([
-                Examen.find({ uidClase: uidClase, fechaFinal: { $gte: fechaActual } }).sort({ fechaComienzo: 'asc' }).limit(6),
-                Examen.countDocuments({ uidClase: uidClase, fechaFinal: { $gte: fechaActual } }).sort({ fechaComienzo: 'asc' }).limit(6)
+                Examen.find({ uidClase: uidClase, fechaFinal: { $gte: fechaActual } }).sort({ fechaComienzo: 'desc' }).limit(6),
+                Examen.countDocuments({ uidClase: uidClase, fechaFinal: { $gte: fechaActual } }).sort({ fechaComienzo: 'desc' }).limit(6)
             ]);
         } else {
             [proximosExamenesAlumno, total] = await Promise.all([
-                Examen.find({ uidClase: uidClase, fechaFinal: { $gte: fechaActual } }).sort({ fecha: 'asc' }),
-                Examen.countDocuments({ uidClase: uidClase, fechaFinal: { $gte: fechaActual } }).sort({ fechaComienzo: 'asc' })
+                Examen.find({ uidClase: uidClase, fechaFinal: { $gte: fechaActual } }).sort({ fecha: 'desc' }),
+                Examen.countDocuments({ uidClase: uidClase, fechaFinal: { $gte: fechaActual } }).sort({ fechaComienzo: 'desc' })
             ]);
         }
 
