@@ -653,6 +653,7 @@ const recuperarPassword = async(req, res = response) => {
 
         res.setHeader('Content-type', 'text/html');
         res.write('<p style="font-size: 4rem; white-space: pre-line;">Su nueva contrase&ntildea es ' + '<b>' + passwordNueva + '</b>' + '. Podr&aacute cambiarla en el apartado editar perfil dentro de la aplicaci&oacuten.</p>');
+        res.end();
 
     } catch (error) {
         console.log(error);
