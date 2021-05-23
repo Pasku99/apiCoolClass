@@ -21,7 +21,7 @@ const CentroEducativoSchema = Schema({
     rol: {
         type: String,
         require: true,
-        default: 'ROL_PARENT'
+        default: 'ROL_CENTRO'
     },
     codigoProfesor: {
         type: String,
@@ -34,7 +34,7 @@ const CentroEducativoSchema = Schema({
     tokenRecovery: {
         type: String,
         default: ''
-    },
+    }
 }, { collection: 'centroeducativo' });
 
 

@@ -4,7 +4,7 @@ Ruta base: /api/login
 
 const { Router } = require('express');
 const { check } = require('express-validator');
-const { loginCentroEducativo, buscarTipoUsuario, tokenCentro, loginProfesor, tokenProfesor, token, loginAlumno, tokenAlumno, comprobarPasswordCentro, comprobarPasswordProfesor, comprobarPasswordAlumno } = require('../controllers/auth');
+const { loginCentroEducativo, buscarTipoUsuario, tokenCentro, loginProfesor, tokenProfesor, token, loginAlumno, tokenAlumno, comprobarPasswordCentro, comprobarPasswordProfesor, comprobarPasswordAlumno, sendRecoverPassword, recuperarPassword } = require('../controllers/auth');
 const { validarCampos } = require('../middleware/validar-campos');
 const { validarJWT } = require('../middleware/validar-jwt');
 
@@ -73,5 +73,14 @@ router.post('/comprobarpasswordalumno', [
     check('password', 'El argumento password es obligatorio').not().isEmpty(),
     validarCampos,
 ], comprobarPasswordAlumno);
+
+router.post('/recovery', [
+    check('email', 'El argumento email es obligatorio').not().isEmpty().trim(),
+    validarCampos
+], sendRecoverPassword);
+
+router.get('/comprobar-password/:token', [
+
+], recuperarPassword);
 
 module.exports = router;

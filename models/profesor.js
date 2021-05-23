@@ -29,7 +29,7 @@ const ProfesorSchema = Schema({
     tokenRecovery: {
         type: String,
         default: ''
-    },
+    }
 }, { collection: 'profesor' });
 
 ProfesorSchema.method('toJSON', function() {

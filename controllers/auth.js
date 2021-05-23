@@ -1,7 +1,9 @@
 const { response } = require('express');
 const bcrypt = require('bcryptjs');
-
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const { generarJWT } = require('../helpers/jwt');
+const generator = require('generate-password');
 const jwt = require('jsonwebtoken');
 const Centroeducativo = require('../models/centroeducativo');
 const Profesor = require('../models/profesor');
@@ -528,4 +530,137 @@ const comprobarPasswordAlumno = async(req, res = response) => {
     }
 }
 
-module.exports = { loginCentroEducativo, tokenCentro, buscarTipoUsuario, loginProfesor, tokenProfesor, token, loginAlumno, tokenAlumno, comprobarPasswordCentro, comprobarPasswordProfesor, comprobarPasswordAlumno }
+const sendRecoverPassword = async(req, res = response) => {
+    //cogemos el email 
+    const email = req.body.email;
+    let resultadoGuardado;
+    try {
+        const centro = await Centroeducativo.find({ email: email });
+        if (!centro) {
+            return res.status(400).json({
+                ok: false,
+                msg: 'Error al buscar el tipo de usuario',
+            });
+        }
+        if (centro.length == 0) {
+            const profesor = await Profesor.find({ email: email });
+            if (!profesor) {
+                return res.status(400).json({
+                    ok: false,
+                    msg: 'Error al buscar el tipo de usuario',
+                });
+            }
+            if (profesor.length == 0) {
+                const alumno = await Alumno.find({ email: email });
+                if (!alumno) {
+                    return res.status(400).json({
+                        ok: false,
+                        msg: 'Error al buscar el tipo de usuario',
+                    });
+                }
+                if (alumno.length == 0) {
+                    return res.status(400).json({
+                        ok: false,
+                        msg: 'Usuario y/o contraseña incorrectos',
+                    });
+                } else {
+                    resultado = alumno;
+                    resultadoGuardado = await Alumno.findOneAndUpdate({ email: email }, { tokenRecovery: crypto.randomBytes(16).toString('hex') }, { new: true });
+                }
+            } else {
+                resultado = profesor;
+                resultadoGuardado = await Profesor.findOneAndUpdate({ email: email }, { tokenRecovery: crypto.randomBytes(16).toString('hex') }, { new: true });
+            }
+
+        } else {
+            resultado = centro;
+            resultadoGuardado = await Centroeducativo.findOneAndUpdate({ email: email }, { tokenRecovery: crypto.randomBytes(16).toString('hex') }, { new: true });
+        }
+        // Envíamos el email vía nodemailer al usuario
+        var transporter = nodemailer.createTransport({ service: 'Gmail', auth: { user: 'coolclasscontacto@gmail.com', pass: 'Kernel2021' } });
+        var mailOptions = { from: 'coolclasscontacto@gmail.com', to: resultadoGuardado.email, subject: 'Recuperación de contraseña - CoolClass', text: 'Muy buenas,\n\n' + 'Por favor clique en el siguiente enlace para recuperar su contraseña:' + process.env.HOSTX + '\/recuperar-password\/' + resultadoGuardado.tokenRecovery };
+        transporter.sendMail(mailOptions, function(err) {
+            // Si hay algún error en el envío devolvemos un error 500
+            if (err) {
+                return res.status(500).json({
+                    ok: false,
+                    msg: err.message
+                });
+            }
+            // Si todo va bien se devolverá lo siguiente
+            res.json({
+                ok: true,
+                msg: 'Un email de recuperación de contraseña ha sido enviado a ' + resultadoGuardado.email + '.',
+                usuario: resultadoGuardado,
+            });
+        });
+
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({
+            ok: false,
+            msg: 'Error recuperando contraseña'
+        });
+    }
+}
+
+const recuperarPassword = async(req, res = response) => {
+    const token = req.params.token;
+    let resultadoGuardado;
+    let passwordNueva;
+    try {
+        const centro = await Centroeducativo.findOne({ tokenRecovery: token });
+        if (!centro) {
+            const profesor = await Profesor.findOne({ tokenRecovery: token });
+            if (!profesor) {
+                const alumno = await Alumno.findOne({ tokenRecovery: token });
+                if (!alumno) {
+                    return res.status(400).json({
+                        ok: false,
+                        msg: 'Usuario y/o contraseña incorrectos',
+                    });
+                } else {
+                    passwordNueva = generator.generate({
+                        length: 8,
+                        numbers: true
+                    });
+                    const salt = bcrypt.genSaltSync();
+                    const cpassword = bcrypt.hashSync(passwordNueva, salt);
+                    alumno.password = cpassword;
+                    resultadoGuardado = await alumno.save();
+                }
+            } else {
+                passwordNueva = generator.generate({
+                    length: 8,
+                    numbers: true
+                });
+                const salt = bcrypt.genSaltSync();
+                const cpassword = bcrypt.hashSync(passwordNueva, salt);
+                profesor.password = cpassword;
+                resultadoGuardado = await profesor.save();
+            }
+
+        } else {
+            passwordNueva = generator.generate({
+                length: 8,
+                numbers: true
+            });
+            const salt = bcrypt.genSaltSync();
+            const cpassword = bcrypt.hashSync(passwordNueva, salt);
+            centro.password = cpassword;
+            resultadoGuardado = await centro.save();
+        }
+
+        res.setHeader('Content-type', 'text/html');
+        res.write('<p style="font-size: 4rem; white-space: pre-line;">Su nueva contrase&ntildea es ' + '<b>' + passwordNueva + '</b>' + '. Podr&aacute cambiarla en el apartado editar perfil dentro de la aplicaci&oacuten.</p>');
+
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({
+            ok: false,
+            msg: 'Error recuperando contraseña'
+        });
+    }
+}
+
+module.exports = { loginCentroEducativo, tokenCentro, buscarTipoUsuario, loginProfesor, tokenProfesor, token, loginAlumno, tokenAlumno, comprobarPasswordCentro, comprobarPasswordProfesor, comprobarPasswordAlumno, sendRecoverPassword, recuperarPassword }

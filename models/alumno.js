@@ -34,6 +34,10 @@ const AlumnoSchema = Schema({
         type: String,
         require: true,
         default: 'ROL_ALUMNO'
+    },
+    tokenRecovery: {
+        type: String,
+        default: ''
     }
 }, { collection: 'alumno' });
 
