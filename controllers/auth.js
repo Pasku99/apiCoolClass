@@ -578,7 +578,7 @@ const sendRecoverPassword = async(req, res = response) => {
         }
         // Envíamos el email vía nodemailer al usuario
         var transporter = nodemailer.createTransport({ service: 'Gmail', auth: { user: 'coolclasscontacto@gmail.com', pass: 'Kernel2021' } });
-        var mailOptions = { from: 'coolclasscontacto@gmail.com', to: resultadoGuardado.email, subject: 'Recuperación de contraseña - CoolClass', text: 'Muy buenas,\n\n' + 'Por favor clique en el siguiente enlace para recuperar su contraseña:' + process.env.HOSTX + '\/recuperar-password\/' + resultadoGuardado.tokenRecovery };
+        var mailOptions = { from: 'coolclasscontacto@gmail.com', to: resultadoGuardado.email, subject: 'Recuperación de contraseña - CoolClass', text: 'Muy buenas,\n\n' + 'Por favor clique en el siguiente enlace para recuperar su contraseña:' + process.env.HOSTX + '\/login/recuperar-password\/' + resultadoGuardado.tokenRecovery };
         transporter.sendMail(mailOptions, function(err) {
             // Si hay algún error en el envío devolvemos un error 500
             if (err) {
