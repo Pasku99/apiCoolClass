@@ -79,7 +79,7 @@ router.post('/recovery', [
     validarCampos
 ], sendRecoverPassword);
 
-router.get('/comprobar-password/:token', [
+router.get('/recuperar-password/:token', [
 
 ], recuperarPassword);
 
